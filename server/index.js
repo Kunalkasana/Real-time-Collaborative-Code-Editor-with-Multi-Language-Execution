@@ -95,7 +95,11 @@ io.on("connection", (socket) => {
 app.post("/compile", async (req, res) => {
   const { source_code, language_id, stdin } = req.body;
 
-  const JUDGE0_URL = process.env.JUDGE0_API_URL || "https://ce.judge0.com";
+ // const JUDGE0_URL = process.env.JUDGE0_API_URL || "https://ce.judge0.com";
+ let JUDGE0_URL = process.env.JUDGE0_API_URL || "https://ce.judge0.com";
+  if (JUDGE0_URL.endsWith("/")) {
+    JUDGE0_URL = JUDGE0_URL.slice(0, -1);
+  }
 
   const options = {
     method: 'POST',
@@ -121,13 +125,14 @@ app.post("/compile", async (req, res) => {
         });
         res.json(result.data);
       } catch (pollError) {
+        console.error("Polling Error:", pollError.message);
         res.status(500).json({ error: "Result retrieval failed" });
       }
     }, 3000); 
 
   } catch (error) {
-    console.error("Demo API Error:", error.message);
-    res.status(500).json({ error: "The demo server is currently busy." });
+    console.error("JUDGE0 REQUEST FAILED:", error.message);
+    res.status(500).json({ error: "The compiler server is currently busy." });
   }
 });
 
