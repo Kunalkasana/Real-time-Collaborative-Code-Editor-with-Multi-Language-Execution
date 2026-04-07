@@ -9,7 +9,10 @@ const axios = require("axios");
 const Document = require("./models/Document");
 
 // Middleware: Standard setup for Cross-Origin and JSON parsing
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  methods: ["GET", "POST"]
+}));
 app.use(express.json()); // CRITICAL: This allows the server to read req.body from React
 
 const server = http.createServer(app);
