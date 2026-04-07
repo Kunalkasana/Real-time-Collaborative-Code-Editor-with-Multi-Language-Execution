@@ -1,0 +1,35 @@
+/* Optimized Global Styles for Cloud IDE */
+:root {
+  color-scheme: dark; /* Forces browser scrollbars to be dark */
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: #1e1e1e; /* Matches Monaco VS-Dark theme */
+  color: #d4d4d4;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow: hidden; /* Prevents annoying double scrollbars */
+}
+
+/* Ensure the editor container takes up all available space */
+.monaco-editor {
+  padding-top: 5px;
+}
+
+/* Custom scrollbar for a pro look */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
