@@ -26,7 +26,7 @@ export default function TextEditor() {
   const [userCount, setUserCount] = useState(0);
 
   useEffect(() => {
-    const s = io("http://localhost:5000");
+    const s = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:5000");
     socketRef.current = s;
 
     s.emit("get-document", documentId);
