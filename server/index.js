@@ -17,7 +17,7 @@ const server = http.createServer(app);
 // Initialize Socket.io with CORS permission for the React frontend
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Default Vite port
+    origin: process.env.CLIENT_URL || "http://localhost:5173", 
     methods: ["GET", "POST"],
   },
 });
@@ -91,10 +91,12 @@ io.on("connection", (socket) => {
 app.post("/compile", async (req, res) => {
   const { source_code, language_id, stdin } = req.body;
 
+  const JUDGE0_URL = process.env.JUDGE0_API_URL || "https://ce.judge0.com";
+
   const options = {
     method: 'POST',
     // Use the official Judge0 CE demo URL (No -extra needed)
-    url: 'https://ce.judge0.com/submissions', 
+    url: `${JUDGE0_URL}/submissions`,
     params: { base64_encoded: 'false', fields: '*' },
     headers: { 'Content-Type': 'application/json' }, // No RapidAPI headers needed!
     data: {
@@ -110,7 +112,7 @@ app.post("/compile", async (req, res) => {
 
     setTimeout(async () => {
       try {
-        const result = await axios.get(`https://ce.judge0.com/submissions/${token}`, {
+        const result = await axios.get(`${JUDGE0_URL}/submissions/${token}`, {
           params: { base64_encoded: 'false', fields: '*' }
         });
         res.json(result.data);
@@ -126,7 +128,8 @@ app.post("/compile", async (req, res) => {
 });
 
 // Final server entry point
-const PORT = 5000;
+const PORT = process.env.PORT || 5000; 
+
 server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
