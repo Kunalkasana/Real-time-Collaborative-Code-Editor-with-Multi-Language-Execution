@@ -62,7 +62,8 @@ export default function TextEditor() {
     setOutput("Compiling and Running...");
 
     try {
-      const response = await fetch("http://localhost:5000/compile", {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+      const response = await fetch(`${backendUrl}/compile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
