@@ -10,8 +10,9 @@ const Document = require("./models/Document");
 
 // Middleware: Standard setup for Cross-Origin and JSON parsing
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:5173",
-  methods: ["GET", "POST"]
+  origin: "*",
+  methods: ["GET", "POST"],
+  credentials: true
 }));
 app.use(express.json()); // CRITICAL: This allows the server to read req.body from React
 
@@ -20,7 +21,7 @@ const server = http.createServer(app);
 // Initialize Socket.io with CORS permission for the React frontend
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173", 
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
