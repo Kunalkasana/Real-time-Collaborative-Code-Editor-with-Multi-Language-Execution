@@ -13,6 +13,7 @@ export default function TextEditor() {
   const { id: documentId } = useParams();
   const socketRef = useRef();
   const editorRef = useRef();
+  const isRemoteUpdate = useRef(false);
 
   // New State: Holds the output from the compiler (stdout or errors)
   const [output, setOutput] = useState("");
@@ -39,7 +40,8 @@ export default function TextEditor() {
 
     s.on("receive_changes", (delta) => {
       // Logic: Only update the value if it's different to prevent cursor flickers
-      if (delta !== editorRef.current.getValue()) {
+      if (editorRef.current && delta !== editorRef.current.getValue()) {
+        isRemoteUpdate.current = true;
         editorRef.current.setValue(delta);
       }
     });
@@ -52,6 +54,11 @@ export default function TextEditor() {
   }, [documentId]);
 
   const handleChange = (value) => {
+
+    if (isRemoteUpdate.current) {
+    isRemoteUpdate.current = false; // Lower the shield for the next time
+    return; // STOP: Don't send this back to the server!
+  }
     socketRef.current.emit("send_changes", value);
     socketRef.current.emit("save-document", value);
   };
