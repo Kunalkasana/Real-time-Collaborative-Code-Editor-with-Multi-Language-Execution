@@ -128,7 +128,7 @@ app.post("/compile", async (req, res) => {
         console.error("Polling Error:", pollError.message);
         res.status(500).json({ error: "Result retrieval failed" });
       }
-    }, 3000); 
+    }, 5000); 
 
   } catch (error) {
     console.error("JUDGE0 REQUEST FAILED:", error.message);

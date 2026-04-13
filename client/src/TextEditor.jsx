@@ -81,7 +81,8 @@ export default function TextEditor() {
         data.stderr ||
         data.compile_output ||
         "Execution finished (No Output).";
-      setOutput(result);
+        const finalOutput = data.stdout ? data.stdout : result;
+      setOutput(finalOutput);
     } catch (err) {
       console.error(err);
       setOutput("Error: Could not connect to the compiler server.");
