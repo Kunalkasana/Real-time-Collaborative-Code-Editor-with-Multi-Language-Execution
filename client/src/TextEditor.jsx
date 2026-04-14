@@ -14,6 +14,7 @@ export default function TextEditor() {
   const socketRef = useRef();
   const editorRef = useRef();
   const isRemoteUpdate = useRef(false);
+  const debounceTimer = useRef();
 
   // New State: Holds the output from the compiler (stdout or errors)
   const [output, setOutput] = useState("");
@@ -39,10 +40,19 @@ export default function TextEditor() {
     });
 
     s.on("receive_changes", (delta) => {
+      // Received changes from other users and delta is the new content of the editor
       // Logic: Only update the value if it's different to prevent cursor flickers
       if (editorRef.current && delta !== editorRef.current.getValue()) {
         isRemoteUpdate.current = true;
-        editorRef.current.setValue(delta);
+
+        const model = editorRef.current.getModel();
+        editorRef.current.executeEdits("remote-update", [
+          {
+            range: model.getFullModelRange(),
+            text: delta,
+            forceMoveMarkers: true, // This keeps the cursor from jumping!
+          },
+        ]);
       }
     });
     // Listen for user count updates from the server
@@ -54,13 +64,16 @@ export default function TextEditor() {
   }, [documentId]);
 
   const handleChange = (value) => {
-
     if (isRemoteUpdate.current) {
-    isRemoteUpdate.current = false; // Lower the shield for the next time
-    return; // STOP: Don't send this back to the server!
-  }
-    socketRef.current.emit("send_changes", value);
-    socketRef.current.emit("save-document", value);
+      isRemoteUpdate.current = false; // Lower the shield for the next time
+      return; // STOP: Don't send this back to the server!
+    }
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      socketRef.current.emit("send_changes", value);
+      socketRef.current.emit("save-document", value);
+      console.log("Data sent to server (Debounced)");
+    }, 200); // Wait for 500ms of "silence" before sending
   };
 
   // ---  Compilation Logic ---
@@ -69,7 +82,8 @@ export default function TextEditor() {
     setOutput("Compiling and Running...");
 
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+      const backendUrl =
+        import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
       const response = await fetch(`${backendUrl}/compile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -88,7 +102,7 @@ export default function TextEditor() {
         data.stderr ||
         data.compile_output ||
         "Execution finished (No Output).";
-        const finalOutput = data.stdout ? data.stdout : result;
+      const finalOutput = data.stdout ? data.stdout : result;
       setOutput(finalOutput);
     } catch (err) {
       console.error(err);
