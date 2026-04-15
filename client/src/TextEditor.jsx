@@ -16,6 +16,9 @@ export default function TextEditor() {
   const isRemoteUpdate = useRef(false);
   const debounceTimer = useRef();
 
+  // Theme Toggle ---
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
   // New State: Holds the output from the compiler (stdout or errors)
   const [output, setOutput] = useState("");
   // New State: Tracks if the code is currently being compiled
@@ -174,7 +177,23 @@ export default function TextEditor() {
             <option value={62}>Java (OpenJDK 13.0.1)</option>
             <option value={63}>JavaScript (Node.js 12.14.0)</option>
           </select>
+
+          {/* Added the Theme Toggle Button with dynamic emojis and colors */}
+          <button
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            style={{
+              padding: "8px 12px",
+              background: isDarkMode ? "#444" : "#ddd",
+              color: isDarkMode ? "#fff" : "#333",
+              border: "1px solid #555",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            {isDarkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+          </button>
         </div>
+
         <button
           onClick={copyRoomLink}
           style={{
@@ -211,25 +230,27 @@ export default function TextEditor() {
         {/* flex: 1 makes this section expand to fill middle space */}
         <Editor
           height="100%"
-          defaultLanguage={languageMap[language]}
-          theme="vs-dark"
+          Language={languageMap[language]}
+          theme={isDarkMode ? "vs-dark" : "light"}
           onMount={(editor) => (editorRef.current = editor)}
           onChange={handleChange}
           options={{
             fontSize: 16,
             minimap: { enabled: false },
             automaticLayout: true,
+            renderValidationDecorations: "on",
           }}
         />
       </div>
 
-      {/* NEW: Input Section (stdin) */}
+      {/* Input Section (stdin) */}
+      {/*  Added dynamic colors for background and borders */}
       <div
         style={{
           height: "100px",
-          background: "#1e1e1e",
+          background: isDarkMode ? "#1e1e1e" : "#f9f9f9",
           padding: "10px",
-          borderTop: "2px solid #333",
+          borderTop: `2px solid ${isDarkMode ? "#333" : "#ddd"}`,
         }}
       >
         <div
@@ -245,64 +266,53 @@ export default function TextEditor() {
         <textarea
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
+          // CHANGE: Textarea background/text colors toggle based on theme
           style={{
             width: "100%",
             height: "60px",
-            background: "#000",
-            color: "#fff",
+            background: isDarkMode ? "#000" : "#fff",
+            color: isDarkMode ? "#fff" : "#000",
             border: "1px solid #444",
-            fontFamily: "monospace",
             padding: "5px",
             resize: "none",
           }}
-          placeholder="Type inputs for cin here..."
         />
       </div>
 
       {/* Bottom Terminal Output */}
+      {/* Terminal background and font colors toggle based on theme */}
       <div
         style={{
           height: "200px",
-          background: "#000",
-          color: "#d4d4d4",
+          background: isDarkMode ? "#000" : "#f0f0f0",
+          color: isDarkMode ? "#d4d4d4" : "#333",
           padding: "15px",
-          fontFamily: "monospace",
-          borderTop: "2px solid #333",
+          borderTop: `2px solid ${isDarkMode ? "#333" : "#ddd"}`,
           overflowY: "auto",
         }}
       >
-        {/* Header Container for Label and Button */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
             marginBottom: "10px",
           }}
         >
           <div
-            style={{
-              color: "#00ff00",
-              fontSize: "12px",
-              fontWeight: "bold",
-            }}
+            style={{ color: "#00ff00", fontSize: "12px", fontWeight: "bold" }}
           >
             TERMINAL OUTPUT:
           </div>
-          <button //Clear Terminal Button
+          <button
             onClick={clearTerminal}
             style={{
               background: "transparent",
-              border: "1px solid #444",
+              border: "1px solid #888",
               color: "#888",
               fontSize: "10px",
               cursor: "pointer",
               padding: "2px 8px",
-              borderRadius: "3px",
-              transition: "0.2s",
             }}
-            onMouseEnter={(e) => (e.target.style.borderColor = "#666")}
-            onMouseLeave={(e) => (e.target.style.borderColor = "#444")}
           >
             Clear
           </button>
