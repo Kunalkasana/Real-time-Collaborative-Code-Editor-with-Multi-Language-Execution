@@ -29,7 +29,7 @@ export default function Home() {
       color: "white", 
       fontFamily: "sans-serif"
     }}>
-      <h1 style={{ color: "#4CAF50", marginBottom: "10px" }}>🚀 DevSync</h1>
+      <h1 style={{ color: "#4CAF50", marginBottom: "10px" }}> DevSync</h1>
       <p style={{ color: "#888", marginBottom: "30px" }}>Real-time Collaborative Code Editor</p>
       
       <div style={{
